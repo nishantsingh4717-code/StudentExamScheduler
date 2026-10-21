@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Exam Timetable Scheduler</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+    <div class="container">
+
+        <header>
+            <h1>Student Exam Timetable Scheduler</h1>
+            <p>DAA Project | Greedy Graph Coloring Algorithm</p>
+        </header>
+
+        <section class="form-section">
+            <h2>Generate Exam Timetable</h2>
+
+            {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/">
+
+                <label for="start_date">
+                    First Exam Date
+                </label>
+
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ request.form.get('start_date', '') }}"
+                    required
+                >
+
+                <label for="enrollments">
+                    Subjects and Student IDs
+                </label>
+
+                <textarea
+                    id="enrollments"
+                    name="enrollments"
+                    rows="9"
+                    placeholder="Python Programming: S01, S02, S03&#10;Data Structures: S01, S04&#10;Algorithms: S02, S05"
+                    required
+                >{{ request.form.get('enrollments', '') }}</textarea>
+
+                <p class="hint">
+                    Format: Subject Name: Student IDs separated by commas.
+                    Enter each subject on a new line.
+                </p>
+
+                <button type="submit">
+                    Generate Timetable
+                </button>
+
+            </form>
+        </section>
+
+        {% if stats %}
+
+        <section class="stats-section">
+            <h2>Scheduling Statistics</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <h3>{{ stats.subjects }}</h3>
+                    <p>Total Subjects</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>{{ stats.conflicts }}</h3>
+                    <p>Conflict Pairs</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>{{ stats.slots }}</h3>
+                    <p>Total Exam Slots</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>{{ stats.days }}</h3>
+                    <p>Total Exam Days</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>{{ stats.runtime }} ms</h3>
+                    <p>Algorithm Runtime</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="table-section">
+            <h2>Generated Exam Timetable</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Exam Day</th>
+                            <th>Exam Date</th>
+                            <th>Time Slot</th>
+                            <th>Students</th>
+                            <th>Color</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in schedule %}
+                        <tr>
+                            <td>{{ item.subject }}</td>
+                            <td>Day {{ item.day }}</td>
+                            <td>{{ item.date }}</td>
+                            <td>{{ item.slot }}</td>
+                            <td>{{ item.students }}</td>
+                            <td>{{ item.color }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <button
+                type="button"
+                onclick="window.print()"
+            >
+                Print / Save as PDF
+            </button>
+        </section>
+
+        {% if graph_image %}
+        <section class="table-section">
+            <h2>Conflict Graph Visualization</h2>
+
+            <p>
+                Each node represents a subject.
+                Each edge represents a conflict caused by common students.
+            </p>
+
+            <img
+                src="{{ url_for('static', filename='conflict_graph.png') }}"
+                alt="Student Exam Conflict Graph"
+                style="display:block; width:100%; max-width:900px; height:auto; margin:20px auto;"
+            >
+        </section>
+        {% endif %}
+
+        <section class="conflict-section">
+            <h2>Subject Conflicts</h2>
+
+            {% if conflicts %}
+            <ul>
+                {% for first, second in conflicts %}
+                <li>
+                    <strong>{{ first }}</strong>
+                    conflicts with
+                    <strong>{{ second }}</strong>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No subject conflicts found.</p>
+            {% endif %}
+        </section>
+
+        {% endif %}
+
+        <footer>
+            <p>
+                Student Exam Timetable Scheduler
+                | Developed using Python, Flask and DSA
+            </p>
+        </footer>
+
+    </div>
+</body>
+</html>

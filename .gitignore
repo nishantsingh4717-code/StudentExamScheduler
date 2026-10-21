@@ -1,0 +1,6 @@
+
+venv/
+__pycache__/
+*.pyc
+.env
+static/conflict_graph.png
